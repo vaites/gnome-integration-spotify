@@ -37,6 +37,7 @@ import time
 import gobject
 import hashlib
 import commands
+
 from dbus import Interface
 from dbus.mainloop.glib import DBusGMainLoop
 
@@ -46,6 +47,7 @@ size = '48x48'
 debug = True
 cache = os.environ['HOME'] + '/.cache/spotify/Covers/'
 timeout = 5000
+linktotray = False
 
 # Notifier
 def show_playing(track = False, interactive = True):
@@ -304,17 +306,19 @@ def get_metadata():
 
 # Get in-screen coords of tray Spotify icon
 def get_tray_coords():
-	wmctrl = which('wmctrl')
-	xwininfo = which('xwininfo')
 	tray_coords = { 'x': 0, 'y': 0 }
 	
-	if wmctrl != False and xwininfo != False:
-		tray = commands.getoutput(wmctrl + ' -l -p | grep "lateral superior" | awk \'{print $1}\'')
-		sptfp = commands.getoutput(xwininfo + ' -id ' + tray + ' -tree | grep "spotify" | awk \'{print $6}\'')
-		sptfx = commands.getoutput('echo ' + sptfp + ' | awk -F "+" \'{print $2+=10}\'')
-		sptfy = commands.getoutput('echo ' + sptfp + ' | awk -F "+" \'{print $3+=13}\'')
+	if linktotray == True:
+		wmctrl = which('wmctrl')
+		xwininfo = which('xwininfo')
 		
-		tray_coords = { 'x': int(sptfx), 'y': int(sptfy) }
+		if wmctrl != False and xwininfo != False:
+			tray = commands.getoutput(wmctrl + ' -l -p | grep "lateral superior" | awk \'{print $1}\'')
+			sptfp = commands.getoutput(xwininfo + ' -id ' + tray + ' -tree | grep "spotify" | awk \'{print $6}\'')
+			sptfx = commands.getoutput('echo ' + sptfp + ' | awk -F "+" \'{print $2+=10}\'')
+			sptfy = commands.getoutput('echo ' + sptfp + ' | awk -F "+" \'{print $3+=13}\'')
+		
+			tray_coords = { 'x': int(sptfx), 'y': int(sptfy) }
 
 	return tray_coords
 
