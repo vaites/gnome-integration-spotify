@@ -312,7 +312,7 @@ class Spotify:
 	# Get the window object
 	def get_window(self, interface = 'local.sp.SpotifyApplicationLinux'):
 		try:
-			proxyobj = bus.get_object('org.mpris.MediaPlayer2.spotify', '/MainWindow')
+			proxyobj = self.bus.get_object('org.mpris.MediaPlayer2.spotify', '/MainWindow')
 			pl = dbus.Interface(proxyobj, interface)
 		except dbus.DBusException:
 			pl = False
