@@ -57,6 +57,7 @@ class Spotify:
 	locale = 'en_US'
 	player = False
 	playing = False
+	pidfile = '/tmp/spotify-daemon.pid'
 	timeout = 5000
 	linktotray = False
 	
@@ -65,6 +66,8 @@ class Spotify:
 			'detail_by'			: 'por',
 			'detail_album'		: 'del disco',
 			'action_next'		: 'Siguiente',
+			'action_oause'		: 'Pausar',
+			'action_prev'		: 'Anterior',
 			'playback_paused'	: 'Reproducción pausada'
 		},
 		
@@ -72,6 +75,8 @@ class Spotify:
 			'detail_by'			: 'by',
 			'detail_album'		: 'from',
 			'action_next'		: 'Next',
+			'action_pause'		: 'Pause',			
+			'action_prev'		: 'Previous',
 			'playback_paused'	: 'Playback paused'
 		}
 	}
@@ -191,6 +196,9 @@ class Spotify:
 		elif action == 'prev':
 			self.player.Previous()
 	
+		elif action == 'playpause':
+			self.player.PlayPause()
+	
 		elif action == 'play' or action == 'pause':
 			if not self.get_metadata():
 				self.player.Play()
@@ -258,6 +266,7 @@ class Spotify:
 				if self.debug == True:
 					print "Spotify not running, exiting..."
 	
+				os.system('rm -f ' + self.pidfile)
 				sys.exit()
 	
 		# Start playing
@@ -515,6 +524,33 @@ class Spotify:
 		
 		# Daemon to listen track change
 		if '--daemon' in sys.argv or 'daemon' in sys.argv or len(sys.argv) == 1:
+			# Get the current PID
+			daemon_pid = str(os.getpid())
+			
+			# Check if daemon is running now
+			if not os.path.exists(self.pidfile):
+				if self.debug == True:
+					print 'Daemon not running, starting...'
+				
+				os.system('echo ' + daemon_pid + ' > ' + self.pidfile)
+			else:
+				old_daemon_pid = open(self.pidfile).read().strip();
+				
+				running = 'ps ax | awk \'{print $1}\' | egrep -c "^' + old_daemon_pid + '$"'
+				running = int(commands.getoutput(running).strip())				
+				
+				if(running == 0):
+					if self.debug == True:
+						print 'Previous daemon exited unexpectly, starting...'
+					
+					os.system('rm -f ' + self.pidfile)
+					os.system('echo ' + daemon_pid + ' > ' + self.pidfile)
+				else:
+					if self.debug == True:
+						print 'Daemon already running, exiting...'
+					
+					sys.exit()
+			
 			# Launch Spotify and wait for it
 			if self.player == False:
 				if self.debug == True:
@@ -551,6 +587,10 @@ class Spotify:
 		# Play/pause
 		elif '--play' in sys.argv or '--pause' in sys.argv or 'play' in sys.argv or 'pause' in sys.argv:
 			self.action_trigger('play')
+		
+		# Play/pause (0.6)
+		elif '--playpause' or 'playpause' in sys.argv:
+			self.action_trigger('playpause')
 		
 		# Stop
 		elif '--stop' in sys.argv or 'stop' in sys.argv:
