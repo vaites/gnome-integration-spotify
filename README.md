@@ -37,7 +37,7 @@ Open playlist (Spotify URIs):
 You can also map your multimedia keys with [XBindKeys](http://www.nongnu.org/xbindkeys/xbindkeys.html) and call this script to control Spotify. 
 
 Browsers
-========
+--------
 
 To allow Firefox/Chrome open playlists:
 
