@@ -16,7 +16,7 @@
 #
 # **** END LICENSE BLOCK ****
 #
-# Gnome Integration for Spotify by David Martínez <gnomeintegration@davidmartinez.net>
+# Gnome Integration for Spotify by David Martínez <contacto@davidmartinez.net>
 #
 # Requirements:
 #
